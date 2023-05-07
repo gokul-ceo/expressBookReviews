@@ -21,22 +21,21 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get the book list available in the shop
-public_users.get("/", function (req, res) {
-  new Promise((resolve, reject) => {
-    const bookList = Object.keys(books).map((key) => ({
-      isbn: key,
-      title: books[key].title,
-    }));
-
-    resolve(bookList);
-  })
-    .then((bookList) => {
-      res.json(bookList);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Error fetching book list." });
+public_users.get("/", async function (req, res) {
+  try {
+    const bookList = await new Promise((resolve, reject) => {
+      const books = require("./booksdb.js");
+      const bookList = Object.keys(books).map((key) => ({
+        isbn: key,
+        title: books[key].title,
+      }));
+      resolve(bookList);
     });
+    res.json(bookList);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching book list." });
+  }
 });
 
 // Get book details based on ISBN
